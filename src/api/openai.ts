@@ -1,13 +1,13 @@
-interface OpenAIToolCall {
+type OpenAIToolCall = {
     id: string;
     type: 'function';
     function: {
         name: string;
         arguments: string;
     };
-}
+};
 
-interface OpenAIChoice {
+type OpenAIChoice = {
     finish_reason: 'stop' | 'length' | 'content_filter' | 'tool_calls';
     index: number;
     message: {
@@ -16,9 +16,9 @@ interface OpenAIChoice {
         role: string;
         tool_calls: OpenAIToolCall[] | null;
     };
-}
+};
 
-export interface OpenAIResponse {
+type OpenAIAnswer = {
     id: string;
     choices: OpenAIChoice[];
     created: number;
@@ -37,16 +37,25 @@ export interface OpenAIResponse {
         prompt_tokens_details: {
             audio_tokens: number;
             cached_tokens: number;
-        }
+        };
     };
-}
+};
+
+type OpenAIError = {
+    error: {
+        message: string;
+        type: "invalid_request_error" | string;
+        param: string | null;
+        code: "invalid_prompt" | "unsupported_value" | string;
+    };
+};
+
+export type OpenAIResponse = OpenAIAnswer | OpenAIError;
 
 export const fetchOpenAICompletion = async (
     apiKey: string,
     model: string,
     prompt: string,
-    maxTokens: number = 150,
-    temperature: number = 0.7
 ): Promise<OpenAIResponse> => {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -56,20 +65,11 @@ export const fetchOpenAICompletion = async (
         },
         body: JSON.stringify({
             model: model,
-            messages: [{ "role": "user", "content": prompt }],
-            max_tokens: maxTokens,
-            temperature: temperature,
+            messages: [
+                { "role": "user", "content": prompt },
+            ],
         }),
     });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        if (errorData.error && errorData.error.code === 'content_filter') {
-            throw new Error("Your prompt violated OpenAI's content policy.");
-        } else {
-            throw new Error(errorData.error.message || 'An error occurred while fetching the response.');
-        }
-    }
 
     const data: OpenAIResponse = await response.json();
     return data;

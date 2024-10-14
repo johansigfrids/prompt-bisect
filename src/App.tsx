@@ -1,19 +1,20 @@
+// src/App.tsx
 import './App.css';
 import { useState } from 'react';
-import { fetchOpenAICompletion } from './api/openai';
+import { bisectPrompt, type BisectResult } from './api/bisect';
 
 const models = [
+  { value: 'o1-mini', label: 'o1-mini' },
+  { value: 'o1-preview', label: 'o1-preview' },
   { value: 'gpt-4o', label: 'gpt-4o' },
   { value: 'gpt-4o-mini', label: 'gpt-4o-mini' },
   { value: 'gpt-4', label: 'gpt-4' },
-  { value: 'o1-mini', label: 'o1-mini' },
-  { value: 'o1-preview', label: 'o1-preview' },
 ];
 
 const App = () => {
   const [apiKey, setApiKey] = useState<string>('');
   const [prompt, setPrompt] = useState<string>('');
-  const [response, setResponse] = useState<string>('');
+  const [bisectResult, setBisectResult] = useState<BisectResult | null>(null);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState<string>(models[0].value);
@@ -21,7 +22,7 @@ const App = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setResponse('');
+    setBisectResult(null);
 
     if (!apiKey) {
       setError('Please enter your OpenAI API key.');
@@ -36,8 +37,9 @@ const App = () => {
     setLoading(true);
 
     try {
-      const completion = await fetchOpenAICompletion(apiKey, selectedModel, prompt);
-      setResponse(completion);
+      const bisect = await bisectPrompt(apiKey, selectedModel, prompt);
+
+      setBisectResult(bisect);
     } catch (err: any) {
       setError(err.message || 'Failed to fetch the response. Please try again later.');
     } finally {
@@ -48,7 +50,11 @@ const App = () => {
   return (
     <div className="content">
       <h1>OpenAI Prompt Bisect</h1>
-      <p>This app helps find what part of a prompt is causing an error. It will repeatedly call the OpenAI API with smaller and smaller sections of the prompt until it finds the problematic part.</p>
+      <p>
+        The content filters for the o1 models can trip up on smallest things. This app helps find what
+        part of a prompt is causing a invalid_prompt error. It will repeatedly call the OpenAI API
+        with smaller and smaller sections of the prompt until it finds the problematic part.
+      </p>
 
       <form onSubmit={handleSubmit} className="form">
         <div className="form-group">
@@ -96,10 +102,15 @@ const App = () => {
       </form>
 
       {error && <div className="error">{error}</div>}
-      {response && (
-        <div className="response">
-          <h2>Response:</h2>
-          <p>{response}</p>
+
+      {bisectResult && (
+        <div className="bisect-result">
+          <h2>Result:</h2>
+          {bisectResult.result === 'segment_found' ? (
+            <pre>{`Problematic Segment:\n${bisectResult.problematicSegment}`}</pre>
+          ) : (
+            <pre>{bisectResult.message}</pre>
+          )}
         </div>
       )}
     </div>
