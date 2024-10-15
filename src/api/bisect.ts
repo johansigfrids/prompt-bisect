@@ -12,12 +12,18 @@ export type BisectResult =
 
 const MAX_RECURSION_DEPTH = 10;
 
-const splitPromptIntoTwo = (prompt: string): { firstHalf: string; secondHalf: string } => {
+const splitPrompt = (prompt: string, parts: number): string[] => {
     const lines = prompt.split('\n');
-    const middleIndex = Math.floor(lines.length / 2);
-    const firstHalf = lines.slice(0, middleIndex).join('\n');
-    const secondHalf = lines.slice(middleIndex).join('\n');
-    return { firstHalf, secondHalf };
+    const result: string[] = [];
+    const linesPerPart = Math.floor(lines.length / parts);
+
+    for (let i = 0; i < parts; i++) {
+        const start = i * linesPerPart;
+        const end = i === parts - 1 ? lines.length : (i + 1) * linesPerPart;
+        result.push(lines.slice(start, end).join('\n'));
+    }
+
+    return result;
 };
 
 export const bisectPrompt = async (
@@ -32,30 +38,36 @@ export const bisectPrompt = async (
 
     const response: OpenAIResponse = await fetchOpenAICompletion(apiKey, model, prompt);
 
+    // Check if the response contains an error and if it's an invalid_prompt error
     let isPromptFilter = false;
     if ('error' in response) {
         if (response.error.code === 'invalid_prompt') {
             isPromptFilter = true;
         } else {
-            throw new Error(`OpenAI API error: ${response.error.message}`)
+            throw new Error(`OpenAI API error: ${response.error.message}`);
         }
     }
 
+    // If the prompt does not trigger invalid_prompt, return no_segment_found
     if (!isPromptFilter) {
         return {
             result: 'no_segment_found',
-            message: 'No invalid_prompt issues were found in the provided prompt.'
+            message: 'No invalid_prompt issues were found in the provided prompt.',
         };
     }
 
-    if (!prompt.includes('\n')) {
+    const newlineCount = (prompt.match(/\n/g) || []).length;
+
+    // 0 newlines means the prompt is a single line, so return it as the problematic segment
+    if (newlineCount === 0) {
         return {
             result: 'segment_found',
-            problematicSegment: prompt
+            problematicSegment: prompt,
         };
     }
 
-    const { firstHalf, secondHalf } = splitPromptIntoTwo(prompt);
+    // Split the prompt into two halves and check each half separately
+    const [firstHalf, secondHalf] = splitPrompt(prompt, 2);
 
     const firstResult = await bisectPrompt(apiKey, model, firstHalf, depth + 1);
     if (firstResult.result === 'segment_found') {
@@ -67,8 +79,27 @@ export const bisectPrompt = async (
         return secondResult;
     }
 
+    // If we get here the the full prompt triggers error but neither half did. That suggests that the problematic 
+    // segment is larger than a single line and spans both halves.
+
+    // If there are at least three newlines, split the prompt into a quarter and three quarters and check each.
+    if (newlineCount >= 3) {
+        const [firstQuarter, remainingThreeQuarters] = splitPrompt(prompt, 4);
+
+        const quarterResult = await bisectPrompt(apiKey, model, firstQuarter, depth + 1);
+        if (quarterResult.result === 'segment_found') {
+            return quarterResult;
+        }
+
+        const threeQuartersResult = await bisectPrompt(apiKey, model, remainingThreeQuarters, depth + 1);
+        if (threeQuartersResult.result === 'segment_found') {
+            return threeQuartersResult;
+        }
+    }
+
+    // Entire prompt must be the problematic segment
     return {
-        result: 'no_segment_found',
-        message: 'No invalid_prompt issues were found in the provided prompt.'
+        result: 'segment_found',
+        problematicSegment: prompt,
     };
 };
