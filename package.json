@@ -2,6 +2,7 @@
   "name": "rsbuild-react-ts",
   "private": true,
   "version": "1.0.0",
+  "homepage": "https://johansigfrids.github.io/prompt-bisect",
   "scripts": {
     "build": "rsbuild build",
     "check": "biome check --write",
