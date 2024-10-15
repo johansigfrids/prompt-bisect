@@ -7,6 +7,8 @@
     "check": "biome check --write",
     "dev": "rsbuild dev --open",
     "format": "biome format --write",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "preview": "rsbuild preview"
   },
   "dependencies": {
@@ -19,6 +21,7 @@
     "@rsbuild/plugin-react": "^1.0.1",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
+    "gh-pages": "^6.2.0",
     "typescript": "^5.5.2"
   }
 }
