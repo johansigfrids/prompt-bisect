@@ -1,7 +1,7 @@
 import './App.css';
 import { useState, type FC } from 'react';
 import { bisectPrompt, type BisectResult } from './api/bisect';
-import InputForm from './components/InputForm';
+import InputForm, { type FormData } from './components/InputForm';
 import Loading from './components/Loading';
 import ErrorDisplay from './components/ErrorDisplay';
 import BisectResultDisplay from './components/BisectResultDisplay';
@@ -11,9 +11,11 @@ const App: FC = () => {
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [currentSegment, setCurrentSegment] = useState<string>('');
+  const [formData, setFormData] = useState<FormData | undefined>(undefined);
 
-  const handleSubmit = async (data: { apiKey: string; prompt: string; selectedModel: string }) => {
+  const handleSubmit = async (data: FormData) => {
     const { apiKey, prompt, selectedModel } = data;
+    setFormData(data);
     setError('');
     setBisectResult(null);
     setCurrentSegment('');
@@ -43,22 +45,29 @@ const App: FC = () => {
     }
   };
 
+  const handleBack = () => {
+    setError('');
+    setBisectResult(null);
+    setCurrentSegment('');
+  };
+
   const renderContent = () => {
     if (loading) {
       return <Loading currentSegment={currentSegment} />;
     }
 
     if (error) {
-      return <ErrorDisplay message={error} />;
+      return <ErrorDisplay message={error} onBack={handleBack} />;
     }
 
     if (bisectResult) {
-      return <BisectResultDisplay bisectResult={bisectResult} />;
+      return <BisectResultDisplay bisectResult={bisectResult} onBack={handleBack} />;
     }
 
     return (
       <InputForm
         onSubmit={handleSubmit}
+        initialData={formData}
       />
     );
   };

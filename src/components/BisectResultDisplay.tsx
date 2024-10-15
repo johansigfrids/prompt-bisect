@@ -4,9 +4,10 @@ import { BisectResult } from '../api/bisect';
 
 interface BisectResultDisplayProps {
     bisectResult: BisectResult;
+    onBack: () => void;
 }
 
-const BisectResultDisplay: FC<BisectResultDisplayProps> = ({ bisectResult }) => (
+const BisectResultDisplay: FC<BisectResultDisplayProps> = ({ bisectResult, onBack }) => (
     <div className="bisect-result">
         <h2>Result:</h2>
         {bisectResult.result === 'segment_found' ? (
@@ -17,6 +18,9 @@ const BisectResultDisplay: FC<BisectResultDisplayProps> = ({ bisectResult }) => 
         ) : (
             <div>{bisectResult.message}</div>
         )}
+        <button onClick={onBack} className="back-button">
+            Back
+        </button>
     </div>
 );
 

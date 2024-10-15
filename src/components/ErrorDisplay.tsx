@@ -3,11 +3,15 @@ import './ErrorDisplay.css';
 
 interface ErrorDisplayProps {
     message: string;
+    onBack: () => void;
 }
 
-const ErrorDisplay: FC<ErrorDisplayProps> = ({ message }) => (
+const ErrorDisplay: FC<ErrorDisplayProps> = ({ message, onBack }) => (
     <div className="error">
         <p>Error: {message}</p>
+        <button onClick={onBack} className="back-button">
+            Back
+        </button>
     </div>
 );
 

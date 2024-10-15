@@ -1,4 +1,4 @@
-import { useState, type FC, type FormEvent } from 'react';
+import { useState, type FC, type FormEvent, useEffect } from 'react';
 import './InputForm.css';
 
 interface Model {
@@ -6,8 +6,15 @@ interface Model {
     label: string;
 }
 
+export interface FormData {
+    apiKey: string;
+    prompt: string;
+    selectedModel: string;
+}
+
 interface InputFormProps {
     onSubmit: (data: { apiKey: string; prompt: string; selectedModel: string }) => void;
+    initialData?: FormData;
 }
 
 const models: Model[] = [
@@ -18,11 +25,10 @@ const models: Model[] = [
     { value: 'gpt-4', label: 'gpt-4' },
 ];
 
-const InputForm: FC<InputFormProps> = ({ onSubmit }) => {
-
-    const [apiKey, setApiKey] = useState<string>('');
-    const [prompt, setPrompt] = useState<string>('');
-    const [selectedModel, setSelectedModel] = useState<string>(models[0].value);
+const InputForm: FC<InputFormProps> = ({ onSubmit, initialData }) => {
+    const [apiKey, setApiKey] = useState<string>(initialData?.apiKey || '');
+    const [prompt, setPrompt] = useState<string>(initialData?.prompt || '');
+    const [selectedModel, setSelectedModel] = useState<string>(initialData?.selectedModel || models[0].value);
 
     const handleFormSubmit = (e: FormEvent) => {
         e.preventDefault();
