@@ -30,10 +30,15 @@ export const bisectPrompt = async (
     apiKey: string,
     model: string,
     prompt: string,
-    depth: number = 0
+    depth: number = 0,
+    onProgress?: (segment: string) => void,
 ): Promise<BisectResult> => {
     if (depth > MAX_RECURSION_DEPTH) {
         throw new Error('Maximum recursion depth reached. Unable to bisect further.');
+    }
+
+    if (onProgress) {
+        onProgress(prompt);
     }
 
     const response: OpenAIResponse = await fetchOpenAICompletion(apiKey, model, prompt);
@@ -69,12 +74,12 @@ export const bisectPrompt = async (
     // Split the prompt into two halves and check each half separately
     const [firstHalf, secondHalf] = splitPrompt(prompt, 2);
 
-    const firstResult = await bisectPrompt(apiKey, model, firstHalf, depth + 1);
+    const firstResult = await bisectPrompt(apiKey, model, firstHalf, depth + 1, onProgress);
     if (firstResult.result === 'segment_found') {
         return firstResult;
     }
 
-    const secondResult = await bisectPrompt(apiKey, model, secondHalf, depth + 1);
+    const secondResult = await bisectPrompt(apiKey, model, secondHalf, depth + 1, onProgress);
     if (secondResult.result === 'segment_found') {
         return secondResult;
     }
@@ -86,12 +91,12 @@ export const bisectPrompt = async (
     if (newlineCount >= 3) {
         const [firstQuarter, remainingThreeQuarters] = splitPrompt(prompt, 4);
 
-        const quarterResult = await bisectPrompt(apiKey, model, firstQuarter, depth + 1);
+        const quarterResult = await bisectPrompt(apiKey, model, firstQuarter, depth + 1, onProgress);
         if (quarterResult.result === 'segment_found') {
             return quarterResult;
         }
 
-        const threeQuartersResult = await bisectPrompt(apiKey, model, remainingThreeQuarters, depth + 1);
+        const threeQuartersResult = await bisectPrompt(apiKey, model, remainingThreeQuarters, depth + 1, onProgress);
         if (threeQuartersResult.result === 'segment_found') {
             return threeQuartersResult;
         }

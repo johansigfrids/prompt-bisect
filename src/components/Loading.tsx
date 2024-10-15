@@ -1,9 +1,19 @@
-import React from 'react';
+import type { FC } from 'react';
 import './Loading.css';
 
-const Loading: React.FC = () => (
+interface LoadingProps {
+    currentSegment: string;
+}
+
+const Loading: FC<LoadingProps> = ({ currentSegment }) => (
     <div className="loading">
         <p>Processing... Please wait.</p>
+        {currentSegment && (
+            <div className="current-segment">
+                <strong>Current Segment:</strong>
+                <pre>{currentSegment}</pre>
+            </div>
+        )}
     </div>
 );
 

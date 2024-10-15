@@ -2,3 +2,16 @@
   font-size: 1.2rem;
   color: #007bff;
 }
+
+.current-segment {
+  margin-top: 10px;
+  background: rgba(0, 123, 255, 0.1);
+  padding: 10px;
+  border-left: 4px solid #007bff;
+}
+
+.current-segment pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+}

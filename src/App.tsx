@@ -10,11 +10,13 @@ const App: FC = () => {
   const [bisectResult, setBisectResult] = useState<BisectResult | null>(null);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [currentSegment, setCurrentSegment] = useState<string>('');
 
   const handleSubmit = async (data: { apiKey: string; prompt: string; selectedModel: string }) => {
     const { apiKey, prompt, selectedModel } = data;
     setError('');
     setBisectResult(null);
+    setCurrentSegment('');
 
     if (!apiKey) {
       setError('Please enter your OpenAI API key.');
@@ -29,18 +31,21 @@ const App: FC = () => {
     setLoading(true);
 
     try {
-      const bisect = await bisectPrompt(apiKey, selectedModel, prompt);
+      const bisect = await bisectPrompt(apiKey, selectedModel, prompt, 0, (segment) => {
+        setCurrentSegment(segment);
+      });
       setBisectResult(bisect);
     } catch (err: any) {
       setError(err.message || 'Failed to fetch the response. Please try again later.');
     } finally {
       setLoading(false);
+      setCurrentSegment('');
     }
   };
 
   const renderContent = () => {
     if (loading) {
-      return <Loading />;
+      return <Loading currentSegment={currentSegment} />;
     }
 
     if (error) {

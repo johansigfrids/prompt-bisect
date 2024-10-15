@@ -68,6 +68,7 @@ export const fetchOpenAICompletion = async (
             messages: [
                 { "role": "user", "content": prompt },
             ],
+            max_completion_tokens: 1,
         }),
     });
 
