@@ -8,7 +8,8 @@ interface ErrorDisplayProps {
 
 const ErrorDisplay: FC<ErrorDisplayProps> = ({ message, onBack }) => (
     <div className="error">
-        <p>Error: {message}</p>
+        <h2>Error:</h2>
+        <p>{message}</p>
         <button onClick={onBack} className="back-button">
             Back
         </button>

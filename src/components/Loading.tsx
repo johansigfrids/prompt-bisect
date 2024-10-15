@@ -7,12 +7,12 @@ interface LoadingProps {
 
 const Loading: FC<LoadingProps> = ({ currentSegment }) => (
     <div className="loading">
-        <p>Processing... Please wait.</p>
+        <h2>Processing segments... Please wait.</h2>
         {currentSegment && (
-            <div className="current-segment">
-                <strong>Current Segment:</strong>
-                <pre>{currentSegment}</pre>
-            </div>
+            <>
+                <h3>Current Segment:</h3>
+                <pre className='current-segment'>{currentSegment}</pre>
+            </>
         )}
     </div>
 );

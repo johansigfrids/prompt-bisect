@@ -12,11 +12,13 @@ const BisectResultDisplay: FC<BisectResultDisplayProps> = ({ bisectResult, onBac
         <h2>Result:</h2>
         {bisectResult.result === 'segment_found' ? (
             <>
-                <p>{`Problematic Segment:`}</p>
-                <div>{bisectResult.problematicSegment}</div>
+                <p>Problematic Segment Found</p>
+                <div className='segment'>{bisectResult.problematicSegment}</div>
             </>
         ) : (
-            <div>{bisectResult.message}</div>
+            <>
+                <p>{bisectResult.message}</p>
+            </>
         )}
         <button onClick={onBack} className="back-button">
             Back

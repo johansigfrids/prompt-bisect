@@ -1,17 +1,22 @@
 .loading {
-  font-size: 1.2rem;
-  color: #007bff;
+  display: grid;
+  gap: 20px;
+}
+
+.loading h2 {
+  margin: 0;
+}
+
+.loading h3 {
+  margin: 0;
 }
 
 .current-segment {
-  margin-top: 10px;
-  background: rgba(0, 123, 255, 0.1);
-  padding: 10px;
-  border-left: 4px solid #007bff;
-}
-
-.current-segment pre {
   white-space: pre-wrap;
   word-wrap: break-word;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 8px;
   margin: 0;
+  text-align: left;
 }

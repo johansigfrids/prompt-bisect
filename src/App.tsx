@@ -1,3 +1,4 @@
+import './reset.css';
 import './App.css';
 import { useState, type FC } from 'react';
 import { bisectPrompt, type BisectResult } from './api/bisect';
@@ -79,6 +80,10 @@ const App: FC = () => {
         The content filters for the o1 models can trip up on smallest things. This app helps find what
         part of a prompt is causing a invalid_prompt error. It will repeatedly call the OpenAI API
         with smaller and smaller sections of the prompt until it finds the problematic part.
+      </p>
+      <p>
+        It uses a binary search and limits completions tokens to 1 in order to cut down on the cost of
+        doing the search, but be mindful that it can still end up expensive for o1 models.
       </p>
 
       {renderContent()}

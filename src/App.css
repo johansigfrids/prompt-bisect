@@ -1,3 +1,4 @@
+
 body {
   margin: 0;
   color: #fff;
@@ -6,26 +7,23 @@ body {
 }
 
 .content {
-  display: flex;
-  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 800px);
+  grid-auto-rows: auto;
+  justify-content: center;
+  justify-items: center;
   line-height: 1.1;
   text-align: center;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  box-sizing: border-box;
+  padding: 30px;
+  gap: 50px;
 }
 
 .content h1 {
   font-size: 3.6rem;
-  font-weight: 700;
-  margin-bottom: 10px;
+  margin: 0;
 }
 
 .content p {
   font-size: 1.2rem;
-  font-weight: 400;
-  opacity: 0.8;
-  margin-bottom: 30px;
+  margin: 0;
 }
