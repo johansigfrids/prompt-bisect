@@ -5,5 +5,8 @@ export default defineConfig({
   plugins: [pluginReact()],
   html: {
     title: 'Prompt Bisect',
-  }
+  },
+  output: {
+    assetPrefix: './',
+  },
 });
