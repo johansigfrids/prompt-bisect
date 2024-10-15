@@ -1,86 +1,90 @@
-import { useState, type FC, type FormEvent, useEffect } from 'react';
+import { type FC, type FormEvent, useEffect, useState } from 'react';
 import './InputForm.css';
 
 interface Model {
-    value: string;
-    label: string;
+  value: string;
+  label: string;
 }
 
 export interface FormData {
-    apiKey: string;
-    prompt: string;
-    selectedModel: string;
+  apiKey: string;
+  prompt: string;
+  selectedModel: string;
 }
 
 interface InputFormProps {
-    onSubmit: (data: { apiKey: string; prompt: string; selectedModel: string }) => void;
-    initialData?: FormData;
+  onSubmit: (data: {
+    apiKey: string;
+    prompt: string;
+    selectedModel: string;
+  }) => void;
+  initialData?: FormData;
 }
 
 const models: Model[] = [
-    { value: 'o1-mini', label: 'o1-mini' },
-    { value: 'o1-preview', label: 'o1-preview' },
-    { value: 'gpt-4o', label: 'gpt-4o' },
-    { value: 'gpt-4o-mini', label: 'gpt-4o-mini' },
-    { value: 'gpt-4', label: 'gpt-4' },
+  { value: 'o1-mini', label: 'o1-mini' },
+  { value: 'o1-preview', label: 'o1-preview' },
+  { value: 'gpt-4o', label: 'gpt-4o' },
+  { value: 'gpt-4o-mini', label: 'gpt-4o-mini' },
+  { value: 'gpt-4', label: 'gpt-4' },
 ];
 
 const InputForm: FC<InputFormProps> = ({ onSubmit, initialData }) => {
-    const [apiKey, setApiKey] = useState<string>(initialData?.apiKey || '');
-    const [prompt, setPrompt] = useState<string>(initialData?.prompt || '');
-    const [selectedModel, setSelectedModel] = useState<string>(initialData?.selectedModel || models[0].value);
+  const [apiKey, setApiKey] = useState<string>(initialData?.apiKey || '');
+  const [prompt, setPrompt] = useState<string>(initialData?.prompt || '');
+  const [selectedModel, setSelectedModel] = useState<string>(
+    initialData?.selectedModel || models[0].value,
+  );
 
-    const handleFormSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        onSubmit({ apiKey, prompt, selectedModel });
-    };
+  const handleFormSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    onSubmit({ apiKey, prompt, selectedModel });
+  };
 
-    return (
-        <form onSubmit={handleFormSubmit} className="form">
-            <div className="form-group">
-                <label htmlFor="apiKey">OpenAI API Key:</label>
-                <input
-                    type="text"
-                    id="apiKey"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="Enter your OpenAI API key"
-                    required
-                />
-            </div>
+  return (
+    <form onSubmit={handleFormSubmit} className="form">
+      <div className="form-group">
+        <label htmlFor="apiKey">OpenAI API Key:</label>
+        <input
+          type="text"
+          id="apiKey"
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          placeholder="Enter your OpenAI API key"
+          required
+        />
+      </div>
 
-            <div className="form-group">
-                <label htmlFor="model">Select Model:</label>
-                <select
-                    id="model"
-                    value={selectedModel}
-                    onChange={(e) => setSelectedModel(e.target.value)}
-                    required
-                >
-                    {models.map((model) => (
-                        <option key={model.value} value={model.value}>
-                            {model.label}
-                        </option>
-                    ))}
-                </select>
-            </div>
+      <div className="form-group">
+        <label htmlFor="model">Select Model:</label>
+        <select
+          id="model"
+          value={selectedModel}
+          onChange={(e) => setSelectedModel(e.target.value)}
+          required
+        >
+          {models.map((model) => (
+            <option key={model.value} value={model.value}>
+              {model.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
-            <div className="form-group">
-                <label htmlFor="prompt">Prompt:</label>
-                <textarea
-                    id="prompt"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Enter your prompt"
-                    required
-                />
-            </div>
+      <div className="form-group">
+        <label htmlFor="prompt">Prompt:</label>
+        <textarea
+          id="prompt"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Enter your prompt"
+          required
+        />
+      </div>
 
-            <button type="submit">
-                Submit
-            </button>
-        </form>
-    );
+      <button type="submit">Submit</button>
+    </form>
+  );
 };
 
 export default InputForm;

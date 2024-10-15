@@ -1,11 +1,11 @@
 import './reset.css';
 import './App.css';
-import { useState, type FC } from 'react';
-import { bisectPrompt, type BisectResult } from './api/bisect';
+import { type FC, useState } from 'react';
+import { type BisectResult, bisectPrompt } from './api/bisect';
+import BisectResultDisplay from './components/BisectResultDisplay';
+import ErrorDisplay from './components/ErrorDisplay';
 import InputForm, { type FormData } from './components/InputForm';
 import Loading from './components/Loading';
-import ErrorDisplay from './components/ErrorDisplay';
-import BisectResultDisplay from './components/BisectResultDisplay';
 
 const App: FC = () => {
   const [bisectResult, setBisectResult] = useState<BisectResult | null>(null);
@@ -34,12 +34,20 @@ const App: FC = () => {
     setLoading(true);
 
     try {
-      const bisect = await bisectPrompt(apiKey, selectedModel, prompt, 0, (segment) => {
-        setCurrentSegment(segment);
-      });
+      const bisect = await bisectPrompt(
+        apiKey,
+        selectedModel,
+        prompt,
+        0,
+        (segment) => {
+          setCurrentSegment(segment);
+        },
+      );
       setBisectResult(bisect);
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch the response. Please try again later.');
+      setError(
+        err.message || 'Failed to fetch the response. Please try again later.',
+      );
     } finally {
       setLoading(false);
       setCurrentSegment('');
@@ -62,28 +70,27 @@ const App: FC = () => {
     }
 
     if (bisectResult) {
-      return <BisectResultDisplay bisectResult={bisectResult} onBack={handleBack} />;
+      return (
+        <BisectResultDisplay bisectResult={bisectResult} onBack={handleBack} />
+      );
     }
 
-    return (
-      <InputForm
-        onSubmit={handleSubmit}
-        initialData={formData}
-      />
-    );
+    return <InputForm onSubmit={handleSubmit} initialData={formData} />;
   };
 
   return (
     <div className="content">
       <h1>OpenAI Prompt Bisect</h1>
       <p>
-        The content filters for the o1 models can trip up on smallest things. This app helps find what
-        part of a prompt is causing a invalid_prompt error. It will repeatedly call the OpenAI API
-        with smaller and smaller sections of the prompt until it finds the problematic part.
+        The content filters for the o1 models can trip up on smallest things.
+        This app helps find what part of a prompt is causing a invalid_prompt
+        error. It will repeatedly call the OpenAI API with smaller and smaller
+        sections of the prompt until it finds the problematic part.
       </p>
       <p>
-        It uses a binary search and limits completions tokens to 1 in order to cut down on the cost of
-        doing the search, but be mindful that it can still end up expensive for o1 models.
+        It uses a binary search and limits completions tokens to 1 in order to
+        cut down on the cost of doing the search, but be mindful that it can
+        still end up expensive for o1 models.
       </p>
 
       {renderContent()}
